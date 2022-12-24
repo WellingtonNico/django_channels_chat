@@ -1,0 +1,108 @@
+{%extends 'base.html'%}
+{%block title%}
+Rooms
+{%endblock%}
+
+{%block body%}
+  <style>
+    .no-left-radius{
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+    }
+    .message{
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin: .5rem;
+      background-color: rgb(201, 198, 198);
+    }
+  </style>
+  
+  <div class="row mt-4 justify-content-center">
+    <h1 class="my-4 text-center">{{object.name}}</h1>
+    <div class="col-6 card shadow-lg p-1" id="messages_list" style="max-height: 60vh;overflow-y: auto;">
+      {%   for message in object.messages.all %}
+        <div class="message shadow">
+          <strong>{{message.user.username}}</strong>
+          <br>
+          <span>{{message.content}}</span>
+          <br>
+          <small class="text-secondary">{{message.date_added|date:"d/m/Y H:i:s"}}</small>
+        </div>
+
+      {% endfor %}
+    </div>
+    <div class="row justify-content-center mt-3">
+      <form class="col-6" id="message_form" >
+        <div class="input-group mb-3">
+          <input type="text" placeholder="Envie uma mensagem" required class="form-control" id="message_input">
+           <div class="input-group-append">
+               <button type="submit" class="btn no-left-radius btn-primary">Send</button>
+           </div>
+       </div>
+      </form>
+
+    </div>
+  </div>
+{%endblock%}
+
+{%block scripts%}
+
+<script>
+  const room = '{{object.slug}}'
+  const username = '{{request.user.username}}'
+  const messageInput = document.querySelector('#message_input')
+  const messagesList = document.querySelector('#messages_list')
+  
+  function scrollToBottom(){
+    messagesList.scrollTop = messagesList.scrollHeight;
+  }
+  var chatSocket
+  function connect(){
+
+    chatSocket = new WebSocket('ws://' + window.location.host + '/ws/' + room + '/')
+    chatSocket.onmessage = (e)=>{
+      const data = JSON.parse(e.data)
+      if(data.message){
+        messagesList.innerHTML += `
+          <div class="message shadow">
+            <strong>${data.username}</strong>
+            <br>
+            <span>${data.message}</span>
+            <br>
+            <small class="text-secondary">${new Date(data.date_added).toLocaleString()}</small>
+          </div>
+        `
+        scrollToBottom()
+      }else{
+        alert('Mensagem vazia')
+      }
+    }
+    chatSocket.onclose = function(e) {
+      console.log('Socket is closed. Reconnect will be attempted in 0.5 second.', e.reason);
+      setTimeout(function() {
+        connect();
+      }, 500);
+    };
+  
+    chatSocket.onerror = function(err) {
+      console.error('Socket encountered error: ', err, 'Closing socket');
+      chatSocket.close();
+    };
+  }
+
+  document.querySelector('#message_form').onsubmit = (e)=>{
+    e.preventDefault()
+    const message = messageInput.value
+    const data = {
+      message,
+      username,
+      room,
+    }
+    chatSocket.send(JSON.stringify(data))
+    messageInput.value=''
+  }
+  scrollToBottom()
+  connect()
+
+</script>
+{%endblock%}

@@ -1,0 +1,24 @@
+{%extends 'base.html'%}
+{%block title%}
+Rooms
+{%endblock%}
+
+{%block body%}
+  <div class="row justify-content-center">
+    <div class="col-12 col-sm-6">
+      <div class="row">
+
+     
+   
+          {%for room in object_list %}
+            <div class="col m-3">
+              <div class="card bg-light p-2 m-2 ">
+                <span class=" text-center">{{room.name}}</span>
+                <a href="{% url 'room_detail' room.slug %}" class="btn btn-sm btn-primary">ir</a>
+              </div>
+            </div>
+          {% endfor %}
+
+ 
+  </div>
+{%endblock%}
