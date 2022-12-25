@@ -1,0 +1,4 @@
+simple django app with channels
+
+
+to run it simply use docker commands = "docker compose build && docker compose up -d"
