@@ -7,8 +7,8 @@ services:
     image: redis:6.0-alpine3.16
     volumes:
       - chat_redis_volume:/data
-    ports:
-      - 6379:6379
+    # ports:
+    #   - 6379:6379
 
   web_daphne:
     container_name: web_daphne
