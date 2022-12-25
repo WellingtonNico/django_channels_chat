@@ -19,7 +19,7 @@ Rooms
   
   <div class="row mt-4 justify-content-center">
     <h1 class="my-4 text-center">{{object.name}}</h1>
-    <div class="col-6 card shadow-lg p-1" id="messages_list" style="max-height: 60vh;overflow-y: auto;">
+    <div class="col-11 col-md-6 card shadow-lg p-1" id="messages_list" style="max-height: 60vh;overflow-y: auto;">
       {%   for message in object.messages.all %}
         <div class="message shadow">
           <strong>{{message.user.username}}</strong>
@@ -28,12 +28,13 @@ Rooms
           <br>
           <small class="text-secondary">{{message.date_added|date:"d/m/Y H:i:s"}}</small>
         </div>
-
+      {%empty%}
+        <strong id="no_message" class="text-secondary text-center">Sem Mensagens</strong>
       {% endfor %}
     </div>
     <div class="row justify-content-center mt-3">
-      <form class="col-6" id="message_form" >
-        <div class="input-group mb-3">
+      <form class="col-md-6 col-11" id="message_form" >
+        <div class="input-group mb-3 shadow-lg">
           <input type="text" placeholder="Envie uma mensagem" required class="form-control" id="message_input">
            <div class="input-group-append">
                <button type="submit" class="btn no-left-radius btn-primary">Send</button>
@@ -52,11 +53,19 @@ Rooms
   const username = '{{request.user.username}}'
   const messageInput = document.querySelector('#message_input')
   const messagesList = document.querySelector('#messages_list')
+  var chatSocket
   
   function scrollToBottom(){
     messagesList.scrollTop = messagesList.scrollHeight;
+    
   }
-  var chatSocket
+
+  function removeEmptyWidget(){
+    try{
+      document.querySelector('#no_message').remove()
+    }catch(e){}
+  }
+  
   function connect(){
 
     chatSocket = new WebSocket('ws://' + window.location.host + '/ws/' + room + '/')
@@ -73,6 +82,7 @@ Rooms
           </div>
         `
         scrollToBottom()
+        removeEmptyWidget()
       }else{
         alert('Mensagem vazia')
       }
