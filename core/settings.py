@@ -141,15 +141,15 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 
-CRISPY_TEMPLATE_PACK = "bootstrap5"
 
+CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("localhost", 6379)],
+            "hosts": [("chat_redis", 6379)],
         },
     },
 }
