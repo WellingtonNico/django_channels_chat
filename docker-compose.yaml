@@ -20,6 +20,7 @@ services:
       - chat_redis
     ports:
       - "8000:8000"
+      - "3000:3000"
     command: sh -c "
       python3 manage.py migrate && 
       python manage.py runserver 0.0.0.0:8000"

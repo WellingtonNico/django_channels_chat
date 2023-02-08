@@ -4,6 +4,7 @@
     // Para obter mais informações, acesse: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+    
         {
             "name": "Python: Django",
             "type": "python",
@@ -14,6 +15,20 @@
             ],
             "django": true,
             "justMyCode": true
+        },
+        {
+            "name":"python docker",
+            "type":"python",
+            "request":"attach",
+            "port":3000,
+            "host":"localhost",
+            "pathMappings": [
+                {
+                    "localRoot": "${workspaceFolder}",
+                    "remoteRoot": "/chat"
+                }
+            ]
+
         }
     ]
 }
