@@ -1,9 +1,7 @@
-import json
 from datetime import datetime
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from asgiref.sync import sync_to_async
 from .models import Room,Message
-from django.contrib.auth import get_user_model
 
 
 class ChatConsumer(AsyncJsonWebsocketConsumer):
@@ -14,20 +12,20 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             self.room_group_name,
             self.channel_name,
         )
+        print(f'Aceitando conexão do usuário {self.scope["user"].username}')
         await self.accept()
 
     async def disconnect(self, code):
         await self.channel_layer.group_discard(self.room_group_name,self.channel_name)
 
-    async def receive(self,text_data):
-        data = json.loads(text_data)
-        await self.save_message(data)
-        data['type'] = 'chat_message'
-        data['date_added'] = datetime.isoformat(datetime.now())
-        await self.channel_layer.group_send(self.room_group_name, data)
+    async def receive_json(self, content, **kwargs):
+        await self.save_message(content)
+        content['type'] = 'chat_message'
+        content['date_added'] = datetime.isoformat(datetime.now())
+        await self.channel_layer.group_send(self.room_group_name, content)
 
-    async def chat_message(self,event):
-        await self.send(text_data=json.dumps(event))
+    async def chat_message(self,content):
+        await self.send_json(content)
 
     @sync_to_async
     def save_message(self,data):
