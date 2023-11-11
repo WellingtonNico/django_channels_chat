@@ -1,104 +1,66 @@
-{%extends 'base.html'%}
-{%block title%}
-Rooms
-{%endblock%}
+{% extends 'base.html' %}
+{% block title %}
+	Rooms
+{% endblock %}
 
-{%block body%}
-  <style>
-    .no-left-radius{
-      border-top-left-radius: 0;
-      border-bottom-left-radius: 0;
-    }
-    .message{
-      border-radius: 10px;
-      padding: 1.5rem;
-      margin: .5rem;
-      background-color: rgb(201, 198, 198);
-    }
-  </style>
-  
-  <div class="row mt-4 justify-content-center">
-    <h1 class="my-4 text-center">{{object.name}}</h1>
-    <div class="col-11 col-md-6 card shadow-lg p-1" id="messages_list" style="max-height: 60vh;overflow-y: auto;">
-      {%   for message in object.messages.all %}
-        {% include 'room/partials/message.html' %}
-      {%empty%}
-        <strong id="no_message" class="text-secondary text-center">Sem Mensagens</strong>
-      {% endfor %}
-    </div>
-    <div class="row justify-content-center mt-3">
-      <form class="col-md-6 col-11" id="message_form" >
-        <div class="input-group mb-3 shadow-lg">
-          <input type="text" placeholder="Envie uma mensagem" required class="form-control" id="message_input">
-           <div class="input-group-append">
-               <button type="submit" class="btn no-left-radius btn-primary">Send</button>
-           </div>
-       </div>
-      </form>
-
-    </div>
-  </div>
-{%endblock%}
-
-{%block scripts%}
-
-<script>
-  const room = '{{object.slug}}'
-  const username = '{{request.user.username}}'
-  const messageInput = document.querySelector('#message_input')
-  const messagesList = document.querySelector('#messages_list')
-  var chatSocket
-  
-  function scrollToBottom(){
-    messagesList.scrollTop = messagesList.scrollHeight;
-    
-  }
-
-  function removeEmptyWidget(){
-    try{
-      document.querySelector('#no_message').remove()
-    }catch(e){}
-  }
-  
-  function connect(){
-
-    chatSocket = new WebSocket('ws://' + window.location.host + '/ws/' + room + '/')
-    chatSocket.onmessage = (e)=>{
-
-      if(e.data){
-        messagesList.innerHTML += e.data
-        scrollToBottom()
-        removeEmptyWidget()
-      }else{
-        alert('Mensagem vazia')
+{% block body %}
+	<style>
+      .no-left-radius {
+          border-top-left-radius: 0;
+          border-bottom-left-radius: 0;
       }
-    }
-    chatSocket.onclose = function(e) {
-      console.log('Socket is closed. Reconnect will be attempted in 0.5 second.', e.reason);
-      setTimeout(function() {
-        connect();
-      }, 500);
-    };
-  
-    chatSocket.onerror = function(err) {
-      console.error('Socket encountered error: ', err, 'Closing socket');
-      chatSocket.close();
-    };
-  }
 
-  document.querySelector('#message_form').onsubmit = (e)=>{
-    e.preventDefault()
-    const message = messageInput.value
-    const data = {
-      message,
-      username,
-      room,
-    }
-    chatSocket.send(JSON.stringify(data))
-    messageInput.value=''
-  }
-  scrollToBottom()
-  connect()
+      .message {
+          border-radius: 10px;
+          padding: 1.5rem;
+          margin: .5rem;
+          background-color: rgb(201, 198, 198);
+      }
+	</style>
 
-</script>
-{%endblock%}
+	<div class="row mt-4 justify-content-center"
+	     hx-on="
+	      htmx:wsAfterMessage: scrollToBottom()
+	      htmx:wsAfterSend: id_input_message.value = ''
+				"
+	     hx-ext="ws"
+	     ws-connect="{{ object.get_websocket_url }}">
+		<h1 class="my-4 text-center">{{ object.name }}</h1>
+		<div class="col-11 col-md-6 card shadow-lg p-1" id="id_lista_mensagens_{{ object.pk }}" hx-swap-oob="beforeend"
+		     style="max-height: 60vh;overflow-y: auto;">
+			{% for message in object.messages.all %}
+				{% include 'room/partials/message.html' %}
+			{% empty %}
+				<strong id="no_message" class="text-secondary text-center">Sem Mensagens</strong>
+			{% endfor %}
+		</div>
+		<div class="row justify-content-center mt-3">
+			<form class="col-md-6 col-11" id="message_form" ws-send>
+				<div class="input-group mb-3 shadow-lg">
+					<input type="text" placeholder="Envie uma mensagem" id="id_input_message" required class="form-control" name="message">
+					<div class="input-group-append">
+						<button type="submit" class="btn no-left-radius btn-primary">Send</button>
+					</div>
+				</div>
+			</form>
+
+		</div>
+	</div>
+{% endblock %}
+
+{% block scripts %}
+
+	<script>
+
+    const messagesList = document.querySelector('#id_lista_mensagens_{{ object.pk }}')
+
+    function scrollToBottom() {
+      messagesList.scrollTop = messagesList.scrollHeight;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      scrollToBottom()
+    })
+
+	</script>
+{% endblock %}

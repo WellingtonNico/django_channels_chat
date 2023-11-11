@@ -4,6 +4,6 @@ from . import consumers
 
 websocket_urlpatterns = [
     path(
-        "ws/<slug:room_name>/", consumers.ChatConsumer.as_asgi(), name="websocket_room"
+        "ws/<slug:room_slug>/", consumers.ChatConsumer.as_asgi(), name="websocket_room"
     )
 ]

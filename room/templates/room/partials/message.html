@@ -1,3 +1,6 @@
+{% if htmx %}
+	<div hx-swap-oob="beforeend:#id_lista_mensagens_{{ message.room.pk }}" hx-swap="outerHTML" hx-on="htmx:afterSwap: alert('ok')">
+{% endif %}
 <div class="message shadow">
 	<strong>{{ message.user.username }}</strong>
 	<br>
@@ -5,3 +8,6 @@
 	<br>
 	<small class="text-secondary">{{ message.date_added|date:"d/m/Y H:i:s" }}</small>
 </div>
+{% if htmx %}
+	</div>
+{% endif %}

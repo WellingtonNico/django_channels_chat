@@ -6,8 +6,8 @@ from django.template.loader import render_to_string
 
 class ChatConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
-        self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
-        self.room_group_name = f"chat_{self.room_name}"
+        self.room_slug = self.scope["url_route"]["kwargs"]["room_slug"]
+        self.room_group_name = f"chat_{self.room_slug}"
         await self.channel_layer.group_add(
             self.room_group_name,
             self.channel_name,
@@ -20,10 +20,9 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
     async def receive_json(self, content, **kwargs):
         content["type"] = "chat_message"
-        message = await self.save_message(content)
-        print(message)
+        message = await self.save_message(content["message"])
         content["message_html"] = render_to_string(
-            "room/partials/message.html", {"message": message}
+            "room/partials/message.html", {"message": message, "htmx": True}
         )
         await self.channel_layer.group_send(self.room_group_name, content)
 
@@ -31,10 +30,11 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         await self.send(text_data=content["message_html"])
 
     @sync_to_async
-    def save_message(self, data) -> Message:
+    def save_message(self, content: str) -> Message:
         """Cria e retorna a mensagem"""
+
         return Message.objects.create(
             user=self.scope["user"],
-            content=data["message"],
-            room=Room.objects.get(slug=data["room"]),
+            content=content,
+            room=Room.objects.get(slug=self.room_slug),
         )
