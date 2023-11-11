@@ -1,7 +1,7 @@
 {% if htmx %}
 	<div hx-swap-oob="beforeend:#id_lista_mensagens_{{ message.room.pk }}" hx-swap="outerHTML" hx-on="htmx:afterSwap: alert('ok')">
 {% endif %}
-<div class="message shadow">
+<div class="message shadow" usuario="{{ message.user.pk }}">
 	<strong>{{ message.user.username }}</strong>
 	<br>
 	<span>{{ message.content }}</span>
