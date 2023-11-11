@@ -21,13 +21,7 @@ Rooms
     <h1 class="my-4 text-center">{{object.name}}</h1>
     <div class="col-11 col-md-6 card shadow-lg p-1" id="messages_list" style="max-height: 60vh;overflow-y: auto;">
       {%   for message in object.messages.all %}
-        <div class="message shadow">
-          <strong>{{message.user.username}}</strong>
-          <br>
-          <span>{{message.content}}</span>
-          <br>
-          <small class="text-secondary">{{message.date_added|date:"d/m/Y H:i:s"}}</small>
-        </div>
+        {% include 'room/partials/message.html' %}
       {%empty%}
         <strong id="no_message" class="text-secondary text-center">Sem Mensagens</strong>
       {% endfor %}
@@ -70,17 +64,9 @@ Rooms
 
     chatSocket = new WebSocket('ws://' + window.location.host + '/ws/' + room + '/')
     chatSocket.onmessage = (e)=>{
-      const data = JSON.parse(e.data)
-      if(data.message){
-        messagesList.innerHTML += `
-          <div class="message shadow">
-            <strong>${data.username}</strong>
-            <br>
-            <span>${data.message}</span>
-            <br>
-            <small class="text-secondary">${new Date(data.date_added).toLocaleString()}</small>
-          </div>
-        `
+
+      if(e.data){
+        messagesList.innerHTML += e.data
         scrollToBottom()
         removeEmptyWidget()
       }else{
