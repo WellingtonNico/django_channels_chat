@@ -21,7 +21,7 @@ services:
       - "3000:3000"
     command: sh -c "
       python3 manage.py migrate && 
-      python manage.py runserver 0.0.0.0:8000"
+      daphne core.asgi:application --bind 0.0.0.0"
     environment:
       REDIS_HOST: chat_redis
       REDIS_PORT: 6379
