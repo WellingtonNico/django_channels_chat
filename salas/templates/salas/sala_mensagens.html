@@ -30,11 +30,11 @@
 	     hx-ext="ws"
 	     ws-connect="{{ object.get_websocket_url }}">
 
-		<h1 class="my-4 text-center">{{ object.name }}</h1>
+		<h1 class="my-4 text-center">{{ object.nome }}</h1>
 
 		<div class="col-11 col-md-6 card shadow-lg p-1" id="id_lista_mensagens" hx-swap-oob="beforeend"
 		     style="max-height: 60vh;overflow-y: auto;">
-			{% for message in object.messages.all %}
+			{% for mensagem in object.mensagens.all %}
 				{% include 'salas/partials/mensagem.html' %}
 			{% empty %}
 				<strong id="no_message" class="text-secondary text-center">Sem Mensagens</strong>

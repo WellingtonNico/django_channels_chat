@@ -30,23 +30,26 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         Recebe o conteúdo da mensagem e cria a mesma,
         retorna a mensagem renderizada para a lista
         """
-        content["type"] = "mensagem"
-        messagem = await self.salvar_mensagem(content["texto"])
-        content["mensagem_html"] = render_to_string(
-            "salas/partials/mensagem.html",
-            {"messagem": messagem, "is_using_socket": True},
-        )
+        content["type"] = "distribuir_mensagem"
+        content["mensagem_html"] = await self.renderizar_html_mensagem(content["texto"])
+
         await self.channel_layer.group_send(self.sala_group_name, content)
 
-    async def mensagem(self, content: dict):
+    async def distribuir_mensagem(self, content: dict):
         await self.send(text_data=content["mensagem_html"])
 
-    @sync_to_async
-    def salvar_mensagem(self, texto: str) -> Mensagem:
+    def criar_mensagem(self, texto: str) -> Mensagem:
         """Cria e retorna a mensagem"""
-
         return Mensagem.objects.create(
             usuario_id=self.scope["user"].pk,
             texto=texto,
             sala_id=self.sala_pk,
+        )
+
+    @sync_to_async
+    def renderizar_html_mensagem(self, texto: str) -> Mensagem:
+        """Cria e retorna a mensagem"""
+        return render_to_string(
+            "salas/partials/mensagem.html",
+            {"mensagem": self.criar_mensagem(texto), "is_using_socket": True},
         )
