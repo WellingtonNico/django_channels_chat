@@ -1,0 +1,29 @@
+{% extends 'layout/index.html' %}
+{% load crispy_forms_tags %}
+{% block title %}
+	Salas
+{% endblock %}
+
+{% block body %}
+	<div class="row justify-content-center">
+		<div class="col-12 col-sm-6 card p-2 shadow-lg my-5">
+			<form action="{% url 'salas:sala_criar' %}" method="post">
+				<div>
+					{% csrf_token %}
+					{% crispy form %}
+					<button class="btn btn-primary">Criar</button>
+				</div>
+			</form>
+		</div>
+	</div>
+	<div class="row justify-content-center">
+		{% for sala in object_list %}
+			<div class="col-3">
+				<div class="card shadow-lg bg-light p-2 m-2 ">
+					<span class=" text-center">{{ sala.nome }}</span>
+					<a href="{% url 'salas:sala_mensagens' sala.slug %}" class="btn btn-sm btn-primary">Entrar</a>
+				</div>
+			</div>
+		{% endfor %}
+	</div>
+{% endblock %}

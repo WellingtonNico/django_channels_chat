@@ -8,15 +8,11 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "core.settings")
 
 django_asgi_app = get_asgi_application()
 
-import room.routing
+from salas.routing import websocket_urlpatterns as salas_websocket_urlpatterns
 
-application = ProtocolTypeRouter({
-    "http":django_asgi_app,
-    "websocket":AuthMiddlewareStack(
-        URLRouter(
-            room.routing.websocket_urlpatterns
-        )
-    )
-})
-
-
+application = ProtocolTypeRouter(
+    {
+        "http": django_asgi_app,
+        "websocket": AuthMiddlewareStack(URLRouter(salas_websocket_urlpatterns)),
+    }
+)

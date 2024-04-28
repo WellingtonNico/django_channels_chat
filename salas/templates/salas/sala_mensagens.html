@@ -1,0 +1,73 @@
+{% extends 'layout/index.html' %}
+{% block title %}
+	Mensagens
+{% endblock %}
+
+{% block body %}
+	<style>
+      .no-left-radius {
+          border-top-left-radius: 0;
+          border-bottom-left-radius: 0;
+      }
+
+      .messagem {
+          border-radius: 10px;
+          padding: 1.5rem;
+          margin: .5rem;
+          background-color: rgb(201, 198, 198);
+      }
+
+      .messagem[usuario="{{ request.user.pk }}"]  {
+				text-align: end !important;
+      }
+	</style>
+
+	<div class="row mt-4 justify-content-center"
+	     hx-on="
+	      htmx:wsAfterMessage: scrollToBottom()
+	      htmx:wsAfterSend: id_input_texto.value = ''
+				"
+	     hx-ext="ws"
+	     ws-connect="{{ object.get_websocket_url }}">
+
+		<h1 class="my-4 text-center">{{ object.name }}</h1>
+
+		<div class="col-11 col-md-6 card shadow-lg p-1" id="id_lista_mensagens" hx-swap-oob="beforeend"
+		     style="max-height: 60vh;overflow-y: auto;">
+			{% for message in object.messages.all %}
+				{% include 'salas/partials/mensagem.html' %}
+			{% empty %}
+				<strong id="no_message" class="text-secondary text-center">Sem Mensagens</strong>
+			{% endfor %}
+		</div>
+
+		<div class="row justify-content-center mt-3">
+			<form class="col-md-6 col-11" id="message_form" ws-send>
+				<div class="input-group mb-3 shadow-lg">
+					<input type="text" placeholder="Envie uma mensagem" id="id_input_texto" required class="form-control" name="texto">
+					<div class="input-group-append">
+						<button type="submit" class="btn no-left-radius btn-primary">Send</button>
+					</div>
+				</div>
+			</form>
+		</div>
+
+	</div>
+{% endblock %}
+
+{% block scripts %}
+
+	<script>
+
+    const messagesList = document.querySelector('#id_lista_mensagens')
+
+    function scrollToBottom() {
+      messagesList.scrollTop = messagesList.scrollHeight;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      scrollToBottom()
+    })
+
+	</script>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends 'layout/index.html' %}
+{%load crispy_forms_tags%}
+{%block title%}
+Rooms
+{%endblock%}
+{%block body%}
+<div class="row justify-content-center">
+  <form method="post" class="col-12 col-sm-6 card p-2 shadow-lg">
+    <div>
+      {% csrf_token %}
+      {% crispy form %}
+      <button class="btn btn-primary">Create</button>
+    </div>
+  </form>
+</div>
+{%endblock%}

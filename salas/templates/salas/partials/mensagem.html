@@ -1,0 +1,14 @@
+{% if is_using_socket %}
+{# se foi renderizada com socket adiciona o conteúdo dentro de uma div pois será removida após o render #}
+	<div hx-swap-oob="beforeend:#id_lista_mensagens" hx-swap="outerHTML">
+{% endif %}
+<div class="messagem shadow" usuario="{{ messagem.usuario.pk }}">
+	<strong>{{ messagem.usuario.nome }}</strong>
+	<br>
+	<span>{{ messagem.texto }}</span>
+	<br>
+	<small class="text-secondary">{{ messagem.criada_em|date:"d/m/Y H:i:s" }}</small>
+</div>
+{% if is_using_socket %}
+	</div>
+{% endif %}

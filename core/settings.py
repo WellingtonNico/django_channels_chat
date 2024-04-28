@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
+from django.urls import reverse_lazy
+from decouple import config
 
 # import environ
 # env = environ.Env()
@@ -18,7 +20,7 @@ from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+AUTH_USER_MODEL = "usuarios.Usuario"
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
@@ -45,8 +47,8 @@ INSTALLED_APPS = [
     "crispy_forms",
     "crispy_bootstrap5",
     "channels",
-    "chat",
-    "room",
+    "usuarios",
+    "salas",
 ]
 
 MIDDLEWARE = [
@@ -59,16 +61,16 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-LOGIN_URL = "/login/"
-LOGIN_REDIRECT_URL = "chat"
-LOGOUT_REDIRECT_URL = "login"
+LOGIN_URL = reverse_lazy("entrar")
+LOGIN_REDIRECT_URL = reverse_lazy("salas:sala_lista")
+LOGOUT_REDIRECT_URL = reverse_lazy("home")
 
 ROOT_URLCONF = "core.urls"
 
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -118,7 +120,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = "pt-BR"
 
 TIME_ZONE = "UTC"
 
@@ -148,7 +150,12 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("chat_redis", 6379)],
+            "hosts": [
+                (
+                    config("REDIS_HOST", default="chat_redis"),
+                    config("REDIS_PORT", default=6379, cast=int),
+                )
+            ],
         },
     },
 }

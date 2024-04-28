@@ -13,7 +13,7 @@ services:
     build: ./
     restart: always
     volumes:
-      - ./:/chat
+      - ./:/app
     depends_on:
       - chat_redis
     ports:
@@ -22,6 +22,9 @@ services:
     command: sh -c "
       python3 manage.py migrate && 
       python manage.py runserver 0.0.0.0:8000"
+    environment:
+      REDIS_HOST: chat_redis
+      REDIS_PORT: 6379
 
 volumes:
   chat_redis_volume:
