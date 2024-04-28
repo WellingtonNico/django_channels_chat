@@ -30,7 +30,7 @@
 	     hx-ext="ws"
 	     ws-connect="{{ object.get_websocket_url }}">
 		<h1 class="my-4 text-center">{{ object.name }}</h1>
-		<div class="col-11 col-md-6 card shadow-lg p-1" id="id_lista_mensagens_{{ object.pk }}" hx-swap-oob="beforeend"
+		<div class="col-11 col-md-6 card shadow-lg p-1" id="id_lista_mensagens" hx-swap-oob="beforeend"
 		     style="max-height: 60vh;overflow-y: auto;">
 			{% for message in object.messages.all %}
 				{% include 'room/partials/message.html' %}
@@ -56,7 +56,7 @@
 
 	<script>
 
-    const messagesList = document.querySelector('#id_lista_mensagens_{{ object.pk }}')
+    const messagesList = document.querySelector('#id_lista_mensagens')
 
     function scrollToBottom() {
       messagesList.scrollTop = messagesList.scrollHeight;

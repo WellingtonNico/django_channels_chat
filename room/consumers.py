@@ -6,6 +6,8 @@ from django.template.loader import render_to_string
 
 class ChatConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
+        if not self.scope["user"].is_authenticated:
+            await self.close()
         self.room_slug = self.scope["url_route"]["kwargs"]["room_slug"]
         self.room_group_name = f"chat_{self.room_slug}"
         await self.channel_layer.group_add(
@@ -19,10 +21,11 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
 
     async def receive_json(self, content, **kwargs):
+        """"""
         content["type"] = "chat_message"
         message = await self.save_message(content["message"])
         content["message_html"] = render_to_string(
-            "room/partials/message.html", {"message": message, "htmx": True}
+            "room/partials/message.html", {"message": message, "is_using_socket": True}
         )
         await self.channel_layer.group_send(self.room_group_name, content)
 

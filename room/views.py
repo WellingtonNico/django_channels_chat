@@ -2,16 +2,16 @@ from .models import Room
 from django.urls import reverse_lazy
 from room.forms import RoomModelForm
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import ListView,DetailView,CreateView
+from django.views.generic import ListView, DetailView, CreateView
 
 
-class RoomCreateView(LoginRequiredMixin,CreateView):
+class RoomCreateView(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy('room_list')
     model = Room
     form_class = RoomModelForm
 
 
-class RoomListView(LoginRequiredMixin,ListView):
+class RoomListView(LoginRequiredMixin, ListView):
     model = Room
 
     def get_context_data(self, **kwargs):
@@ -20,5 +20,5 @@ class RoomListView(LoginRequiredMixin,ListView):
         return context
 
 
-class RoomDetailView(DetailView):
+class RoomDetailView(LoginRequiredMixin, DetailView):
     model = Room

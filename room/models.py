@@ -8,7 +8,7 @@ class Room(models.Model):
     slug = models.SlugField(unique=True)
 
     def get_websocket_url(self):
-        return f"/ws/{self.slug}/"
+        return f"/ws/rooms/{self.slug}/messages/"
 
     def get_absolute_url(self):
         return reverse("room_detail", args=(self.slug,))
